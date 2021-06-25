@@ -8,17 +8,9 @@ const userSchema = new mongoose.Schema({
   lastName: String,
 });
 const tokenSchema = new mongoose.Schema({
-  Id: String,
+  userid: mongoose.ObjectId,
   token: String,
-});
-const chainSchema = new mongoose.Schema({
-  chainname: String,
-  emailgroupid: String,
-  message: Object,
-  userid: String,
-  frequency: Object,
 });
 
 module.exports.userSchema = userSchema;
 module.exports.tokenSchema = tokenSchema;
-module.exports.chainSchema = chainSchema;

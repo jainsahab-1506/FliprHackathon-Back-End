@@ -1,13 +1,11 @@
-const express = require("express");
 const bodyparser = require("body-parser");
+const express = require("express");
 const mongoose = require("mongoose");
-require("dotenv").config();
-const app = express();
-const session = require("express-session");
 const passport = require("passport");
-const passportLocalMongoose = require("passport-local-mongoose");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const findOrCreate = require("mongoose-findorcreate");
+const session = require("express-session");
+require("dotenv").config();
+
+const app = express();
 
 const register = require("./register");
 const login = require("./login");
@@ -16,14 +14,17 @@ const logoutroutes = require("./logout.js");
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyparser.json());
+const emailGroupRouter = require("./email-group/routes");
+const ChainRouter = require("./chains/routes.js");
+
 mongoose.connect(
   "mongodb+srv://admin-naman:" +
     process.env.CLUSTER_PASSWORD +
     "@cluster0.3djy5.mongodb.net/FliperDB?retryWrites=true&w=majority",
-  { useNewUrlParser: true }
-  //   () => {
-  //     console.log("Database connected.");
-  //   }
+  { useNewUrlParser: true },
+  () => {
+    console.log("Database connected.");
+  }
 );
 
 app.use(
@@ -36,17 +37,21 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-//
-
-//
 app.use(express.static("public"));
+
 app.get("/", function (req, res) {
   res.send("Hello");
 });
+
 app.post("/register", register);
 app.post("/login", login);
 app.use("/", oauthloginroutes);
 app.use("/", logoutroutes);
+
+// Handles all the routes related to email groups
+app.use("/email-group/:id", emailGroupRouter);
+
+app.use("/chains", ChainRouter);
 
 app.listen(process.env.PORT || 3000, function (req, res) {
   console.log("Running");

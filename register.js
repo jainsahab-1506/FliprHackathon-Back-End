@@ -39,13 +39,7 @@ const register = (req, res) => {
         res.send("Error");
       } else {
         passport.authenticate("local")(req, res, function () {
-          User.find({ username: req.body.username }, function (err, userinfo) {
-            if (!err) {
-              res.send(userinfo);
-            } else {
-              res.send(err);
-            }
-          });
+          res.send(user);
         });
       }
     }

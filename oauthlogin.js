@@ -39,11 +39,7 @@ passport.use(
     function (accessToken, refreshToken, profile, cb) {
       console.log(profile.emails);
       var newUserName = profile.name.givenName + profile.id;
-      const data = new Token({
-        googleId: profile.id,
-        token: accessToken,
-      });
-      data.save();
+
       User.findOrCreate(
         {
           googleId: profile.id,
@@ -53,7 +49,12 @@ passport.use(
           email: profile.emails[0].value,
         },
         function (err, user) {
-          userprofile = user;
+          const data = new Token({
+            userid: user._id,
+            token: accessToken,
+          });
+          data.save();
+
           return cb(err, user);
         }
       );
