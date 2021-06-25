@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const emailGroupSchema = mongoose.Schema({
 	owner: {
-		type: ObjectId,
+		type: mongoose.ObjectId,
 		required: true,
 	},
 	groupName: {
