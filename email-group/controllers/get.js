@@ -1,15 +1,24 @@
+const mongoose = require('mongoose');
+
 const EmailGroup = require('./../model');
+const userSchema = require('./../../model');
+
+const User = new mongoose.model('User', userSchema);
 
 const getEmailGroup = async (req, res) => {
 	try {
-		const emailGroupId = req.params.id;
-
-		const emailGroup = await EmailGroup.findById(emailGroupId);
-		if (!emailGroup) {
-			return res.status(400).json({ error: 'No such email group found.' });
+		const ownerId = req.params.id;
+		const owner = await User.find({ _id: ownerId });
+		if (!owner) {
+			return res.status(400).json({
+				error:
+					'No such user exists. Cannot show email groups without a valid owner.',
+			});
 		}
 
-		return res.status(200).json(emailGroup);
+		const emailGroups = await EmailGroup.find({ owner: ownerId });
+
+		return res.status(200).json(emailGroups);
 	} catch (error) {
 		return res.status(400).json({ error: error.message });
 	}
