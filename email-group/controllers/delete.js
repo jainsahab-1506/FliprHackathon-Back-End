@@ -4,7 +4,7 @@ const deleteEmailGroup = async (req, res) => {
 	try {
 		const emailGroupId = req.params.id;
 
-		EmailGroup.deleteOne(emailGroupId, (err) => {
+		EmailGroup.deleteOne({ _id: emailGroupId }, (err) => {
 			if (err) {
 				return res.status(400).json({ error: err.message });
 			}
