@@ -12,8 +12,10 @@ const findOrCreate = require("mongoose-findorcreate");
 const register = require("./register");
 const login = require("./login");
 const oauthloginroutes = require("./oauthlogin.js");
+const logoutroutes = require("./logout.js");
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(bodyparser.json());
 mongoose.connect(
   "mongodb+srv://admin-naman:" +
     process.env.CLUSTER_PASSWORD +
@@ -44,22 +46,7 @@ app.get("/", function (req, res) {
 app.post("/register", register);
 app.post("/login", login);
 app.use("/", oauthloginroutes);
-app.get("/logout", function (req, res) {
-  console.log("call");
-  req.logout();
-  res.redirect("/");
-});
-app.get(
-  "/auth/google/secrets",
-  passport.authenticate("google", {
-    scope: ["profile"],
-    failureRedirect: "/",
-  }),
-  function (req, res) {
-    // Successful authentication, redirect to secrets.
-    res.send("Login");
-  }
-);
+app.use("/", logoutroutes);
 
 app.listen(process.env.PORT || 3000, function (req, res) {
   console.log("Running");

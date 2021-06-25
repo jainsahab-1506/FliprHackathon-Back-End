@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const findOrCreate = require("mongoose-findorcreate");
 
-const userSchema = require("./model");
+const { userSchema } = require("./model");
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
@@ -33,7 +33,13 @@ const login = (req, res) => {
       console.log(err);
     } else {
       passport.authenticate("local")(req, res, function () {
-        res.send("login done");
+        User.find({ username: req.body.username }, function (err, userinfo) {
+          if (!err) {
+            res.send(userinfo);
+          } else {
+            res.send(err);
+          }
+        });
       });
     }
   });

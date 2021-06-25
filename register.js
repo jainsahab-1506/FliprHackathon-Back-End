@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const findOrCreate = require("mongoose-findorcreate");
 
-const userSchema = require("./model");
+const { userSchema } = require("./model");
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
@@ -26,7 +26,12 @@ passport.deserializeUser(function (id, done) {
 const register = (req, res) => {
   console.log(req.body);
   User.register(
-    { username: req.body.username },
+    {
+      username: req.body.username,
+      email: req.body.username,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+    },
     req.body.password,
     function (err, user) {
       if (err) {
@@ -34,7 +39,13 @@ const register = (req, res) => {
         res.send("Error");
       } else {
         passport.authenticate("local")(req, res, function () {
-          res.send("registerdone");
+          User.find({ username: req.body.username }, function (err, userinfo) {
+            if (!err) {
+              res.send(userinfo);
+            } else {
+              res.send(err);
+            }
+          });
         });
       }
     }

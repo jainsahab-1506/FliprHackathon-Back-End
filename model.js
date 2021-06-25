@@ -3,9 +3,22 @@ const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   googleId: String,
-  secret: String,
+  email: String,
+  firstName: String,
+  lastName: String,
+});
+const tokenSchema = new mongoose.Schema({
+  Id: String,
+  token: String,
+});
+const chainSchema = new mongoose.Schema({
+  chainname: String,
+  emailgroupid: String,
+  message: Object,
+  userid: String,
+  frequency: Object,
 });
 
-module.exports = userSchema;
-// CLIENT_ID=97781066717-peq315812iffrl0jc4q2jdsbn1hjlrn8.apps.googleusercontent.com
-// CLIENT_SECRET=nYdRwitf8P_nh3pF9LNGTMj1
+module.exports.userSchema = userSchema;
+module.exports.tokenSchema = tokenSchema;
+module.exports.chainSchema = chainSchema;
