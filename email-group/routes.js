@@ -6,7 +6,7 @@ const editEmailGroup = require('./controllers/edit.js');
 const getEmailGroup = require('./controllers/get.js');
 
 router.delete('/', deleteEmailGroup);
-router.get('/', getEmailGroup);
+router.get('/:id', getEmailGroup);
 router.post('/', createEmailGroup);
 router.put('/', editEmailGroup);
 

@@ -3,7 +3,7 @@ const EmailGroup = require('./../model');
 const getEmailGroup = async (req, res) => {
 	try {
 		const ownerId = req.params.id;
-
+		console.log(ownerId);
 		const emailGroups = await EmailGroup.find({ owner: ownerId });
 		if (!emailGroups) {
 			return res.status(400).json({ error: 'Owner has no email groups.' });
