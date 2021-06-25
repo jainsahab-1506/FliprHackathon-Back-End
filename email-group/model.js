@@ -10,7 +10,7 @@ const emailGroupSchema = mongoose.Schema({
 		required: true,
 	},
 	to: {
-		type: String,
+		type: [String],
 		required: true,
 	},
 	cc: {
