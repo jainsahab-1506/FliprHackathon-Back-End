@@ -41,11 +41,11 @@ const updateuser = (req, res) => {
             googleId: req.body.googleId,
             email: req.body.email,
             password: req.body.password ? req.body.password : "",
-            mailCredentials: req.body.mailCredentials
-              ? req.body.mailCredentials
-              : {},
+            mailCredentialsId: req.body.mailCredentialsId
+              ? req.body.mailCredentialsId
+              : "",
             username: req.body.username,
-            verified: req.body.mailCredentials ? true : false,
+            verified: req.body.mailCredentialsId ? true : false,
           };
           User.findOneAndUpdate(
             { _id: ownerId },

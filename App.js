@@ -18,6 +18,7 @@ const emailGroupRouter = require("./email-group/routes");
 const ChainRouter = require("./chains/routes.js");
 const UserRouter = require("./users/routes.js");
 const MessageRouter = require("./messages/routes.js");
+const MailRouter = require("./users/mailcredentials.js");
 
 mongoose.connect(
   "mongodb+srv://admin-naman:" +
@@ -57,6 +58,7 @@ app.use("/chains", ChainRouter);
 
 app.use("/users", UserRouter);
 app.use("/messages", MessageRouter);
+app.use("/", MailRouter);
 
 app.listen(process.env.PORT || 3000, function (req, res) {
   console.log("Running");
