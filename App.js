@@ -32,7 +32,7 @@ mongoose.connect(
 
 app.use(
   session({
-    secret: "Our little secret.",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })

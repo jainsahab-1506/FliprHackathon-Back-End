@@ -27,6 +27,7 @@ passport.deserializeUser(function (id, done) {
 });
 var userprofile, authtoken;
 passport.use(
+  "google",
   new GoogleStrategy(
     {
       clientID: process.env.CLIENT_ID,
@@ -58,7 +59,9 @@ passport.use(
 );
 router.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
 );
 router.get(
   "/auth/google/secrets",
