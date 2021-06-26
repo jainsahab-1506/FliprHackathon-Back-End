@@ -27,35 +27,26 @@ const getcred = (req, res) => {
       } else {
         console.log(token);
         const tokenOwner = token.userid;
-        const ownerId = req.params.ownerid;
-        if (tokenOwner.toString() !== ownerId.toString()) {
-          console.log("Expected:", tokenOwner);
-          console.log("Found:", ownerId);
 
-          return res.status(400).json({
-            error: "Unauthorized request.",
-          });
-        } else {
-          User.find({ _id: ownerId }, function (err, owner) {
-            if (!owner) {
-              return res.status(400).json({
-                error:
-                  "No such user exists. Cannot show Chains without a valid owner.",
-              });
-            }
-            Credential.find({ _id: req.params.id }, function (err, credential) {
-              if (err) {
-                return res.status(400).json({
-                  error: "Cannot Fetch",
-                });
-              } else {
-                return res
-                  .status(200)
-                  .json({ success: "Credential Found", credential });
-              }
+        User.find({ _id: tokenOwner }, function (err, owner) {
+          if (!owner) {
+            return res.status(400).json({
+              error:
+                "No such user exists. Cannot show Chains without a valid owner.",
             });
+          }
+          Credential.find({ _id: req.params.id }, function (err, credential) {
+            if (err) {
+              return res.status(400).json({
+                error: "Cannot Fetch",
+              });
+            } else {
+              return res
+                .status(200)
+                .json({ success: "Credential Found", credential });
+            }
           });
-        }
+        });
       }
     });
   } catch (error) {

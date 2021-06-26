@@ -1,9 +1,11 @@
-const { Chain, Messages } = require("./../model");
+const { Chain } = require("./../model");
+const { Messages } = require("./../../messages/models");
+const EmailGroup = require("./../../email-group/model");
 const mongoose = require("mongoose");
 const { userSchema, tokenSchema } = require("../../model");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
-const getchains = (req, res) => {
+const getchains = async (req, res) => {
   try {
     console.log("called");
     const authHeader = req.headers.authorization;
@@ -20,32 +22,30 @@ const getchains = (req, res) => {
       });
     }
 
-    Token.findOne({ token: tokenData }, function (err, token) {
+    Token.findOne({ token: tokenData }, async function (err, token) {
       if (!token) {
         return res.status(400).json({
           error: "Unauthorized request.",
         });
       } else {
+        console.log(req.params.id);
         if (req.params.id) {
-          Chain.find({ _id: req.params.id }, function (err, chaindata) {
-            if (err) {
-              return res.status(400).json({
-                error: "Cannot Fetch",
-              });
-            } else {
-              return res.status(200).json({ success: "Data Found", chaindata });
-            }
+          const chaindata = await Chain.findOne({
+            _id: req.params.id,
+          })
+            .populate("emailgroupid")
+            .populate("messageid");
+
+          return res.status(200).json({
+            success: "Data Found",
+            chaindata,
           });
         } else {
-          Chain.find({ userid: token.userid }, function (err, chains) {
-            if (err) {
-              return res.status(400).json({
-                error: "Cannot Fetch",
-              });
-            } else {
-              return res.status(200).json({ success: "Data Found", chains });
-            }
-          });
+          const chains = await Chain.find({
+            userid: token.userid,
+          }).populate("emailgroupid");
+
+          return res.status(200).json({ success: "Data Found", chains });
         }
       }
     });

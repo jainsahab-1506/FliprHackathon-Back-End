@@ -62,11 +62,15 @@ const login = (req, res) => {
               } else {
                 return res
                   .status(200)
-                  .json({ success: "Logged In Successfully.", auth });
+                  .json({
+                    success: "Logged In Successfully.",
+                    token: auth.token,
+                    profile: userinfo,
+                  });
               }
             });
           } else {
-            res.send(err);
+            return res.status(400).json({ error: "Email Exists " });
           }
         });
       });

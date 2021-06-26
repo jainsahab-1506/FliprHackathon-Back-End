@@ -26,40 +26,31 @@ const updateuser = (req, res) => {
         });
       } else {
         const tokenOwner = token.userid;
-        const ownerId = req.params.ownerid;
-        if (tokenOwner.toString() !== ownerId.toString()) {
-          // console.log("Expected:", tokenOwner);
-          // console.log("Found:", ownerId);
 
-          return res.status(400).json({
-            error: "Unauthorized request.",
-          });
-        } else {
-          const newuser = {
-            firstName: req.body.firstName,
-            lastName: req.body.LastName,
-            googleId: req.body.googleId,
-            email: req.body.email,
-            password: req.body.password ? req.body.password : "",
-            mailCredentialsId: req.body.mailCredentialsId
-              ? req.body.mailCredentialsId
-              : "",
-            username: req.body.username,
-            verified: req.body.mailCredentialsId ? true : false,
-          };
-          User.findOneAndUpdate(
-            { _id: ownerId },
-            newuser,
-            { new: true, omitUndefined: true, runValidators: true },
-            function (err, updateduser) {
-              if (err) {
-                res.send(err);
-              } else {
-                res.send(updateduser);
-              }
+        const newuser = {
+          firstName: req.body.firstName,
+          lastName: req.body.LastName,
+          googleId: req.body.googleId,
+          email: req.body.email,
+          password: req.body.password ? req.body.password : "",
+          mailCredentialsId: req.body.mailCredentialsId
+            ? req.body.mailCredentialsId
+            : "",
+          username: req.body.username,
+          verified: req.body.mailCredentialsId ? true : false,
+        };
+        User.findOneAndUpdate(
+          { _id: tokenOwner },
+          newuser,
+          { new: true, omitUndefined: true, runValidators: true },
+          function (err, updateduser) {
+            if (err) {
+              res.send(err);
+            } else {
+              res.send(updateduser);
             }
-          );
-        }
+          }
+        );
       }
     });
   } catch (error) {

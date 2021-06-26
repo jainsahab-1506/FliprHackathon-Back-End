@@ -35,11 +35,53 @@ const register = (req, res) => {
     req.body.password,
     function (err, user) {
       if (err) {
-        console.log(err);
-        res.send("Error");
+        return res.status(400).json({ error: "Internal Server Error " });
       } else {
         passport.authenticate("local")(req, res, function () {
-          res.send(user);
+          User.findOne(
+            { username: req.body.username },
+            function (err, userinfo) {
+              if (!err) {
+                const token = jwt.sign(
+                  {
+                    userId: userinfo.username,
+                  },
+                  process.env.SECRET
+                );
+                var tokendata = new Token({
+                  token: token,
+                  userid: userinfo._id,
+                });
+
+                tokendata.save(function (err, auth) {
+                  if (err) {
+                    Token.findOne(
+                      { userid: userinfo._id },
+                      function (error, resp) {
+                        if (resp) {
+                          return res
+                            .status(400)
+                            .json({ error: "User Already Logged In " });
+                        } else {
+                          return res
+                            .status(400)
+                            .json({ error: "Internal Server Error " });
+                        }
+                      }
+                    );
+                  } else {
+                    return res.status(200).json({
+                      success: "Logged In Successfully.",
+                      token: auth.token,
+                      profile: userinfo,
+                    });
+                  }
+                });
+              } else {
+                return res.status(400).json({ error: "Email Exists " });
+              }
+            }
+          );
         });
       }
     }

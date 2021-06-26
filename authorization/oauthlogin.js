@@ -74,7 +74,6 @@ router.get(
 
     tokendata.save(function (err, auth) {
       if (err) {
-        console.log(userprofile._id);
         Token.findOne({ userid: userprofile._id }, function (error, resp) {
           console.log(resp);
           if (resp) {
@@ -86,7 +85,11 @@ router.get(
       } else {
         return res
           .status(200)
-          .json({ success: "Logged In Successfully.", auth });
+          .json({
+            success: "Logged In Successfully.",
+            token: auth.token,
+            profile: userprofile,
+          });
       }
     });
 
