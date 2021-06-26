@@ -25,35 +25,16 @@ const getmessage = (req, res) => {
         });
       } else {
         const tokenOwner = token.userid;
-        const ownerId = req.params.ownerid;
-        if (tokenOwner.toString() !== ownerId.toString()) {
-          console.log("Expected:", tokenOwner);
-          console.log("Found:", ownerId);
 
-          return res.status(400).json({
-            error: "Unauthorized request.",
-          });
-        } else {
-          User.find({ _id: ownerId }, function (err, owner) {
-            if (!owner) {
-              return res.status(400).json({
-                error:
-                  "No such user exists. Cannot show Chains without a valid owner.",
-              });
-            }
-            Messages.find({ _id: req.params.id }, function (err, message) {
-              if (err) {
-                return res.status(400).json({
-                  error: "Cannot Fetch",
-                });
-              } else {
-                return res
-                  .status(200)
-                  .json({ success: "Message Found", message });
-              }
+        Messages.find({ _id: req.params.id }, function (err, message) {
+          if (err) {
+            return res.status(400).json({
+              error: "Cannot Fetch",
             });
-          });
-        }
+          } else {
+            return res.status(200).json({ success: "Message Found", message });
+          }
+        });
       }
     });
   } catch (error) {

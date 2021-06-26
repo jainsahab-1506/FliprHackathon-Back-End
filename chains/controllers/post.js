@@ -29,18 +29,7 @@ const authorizeRequest = (req, res, next) => {
           error: "Invalid token.",
         });
       } else {
-        const tokenOwner = token.userid;
-        const ownerId = req.params.ownerid;
-        if (tokenOwner.toString() !== ownerId.toString()) {
-          console.log("Expected:", tokenOwner);
-          console.log("Found:", ownerId);
-
-          return res.status(400).json({
-            error: "Unauthorized request.",
-          });
-        } else {
-          next();
-        }
+        next();
       }
     });
   } catch (error) {

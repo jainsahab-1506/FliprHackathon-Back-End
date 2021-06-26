@@ -27,27 +27,18 @@ const deletechain = (req, res) => {
         });
       } else {
         const tokenOwner = token.userid;
-        const ownerId = req.params.ownerid;
-        if (tokenOwner.toString() !== ownerId.toString()) {
-          console.log("Expected:", tokenOwner);
-          console.log("Found:", ownerId);
 
-          return res.status(400).json({
-            error: "Unauthorized request.",
-          });
-        } else {
-          Chain.deleteOne({ _id: id }, function (err) {
-            if (err) {
-              return res.status(400).json({
-                error: "Unable to delete",
-              });
-            } else {
-              return res
-                .status(200)
-                .json({ success: "Chain Successfully Deleted." });
-            }
-          });
-        }
+        Chain.deleteOne({ _id: id }, function (err) {
+          if (err) {
+            return res.status(400).json({
+              error: "Unable to delete",
+            });
+          } else {
+            return res
+              .status(200)
+              .json({ success: "Chain Successfully Deleted." });
+          }
+        });
       }
     });
   } catch (error) {

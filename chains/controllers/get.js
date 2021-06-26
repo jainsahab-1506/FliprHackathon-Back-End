@@ -5,6 +5,7 @@ const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
 const getchains = (req, res) => {
   try {
+    console.log("called");
     const authHeader = req.headers.authorization;
     if (!authHeader.startsWith("Bearer ")) {
       return res.status(400).json({
