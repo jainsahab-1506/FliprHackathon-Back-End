@@ -22,35 +22,28 @@ const getchains = (req, res) => {
     Token.findOne({ token: tokenData }, function (err, token) {
       if (!token) {
         return res.status(400).json({
-          error: "Invalid token.",
+          error: "Unauthorized request.",
         });
       } else {
-        const tokenOwner = token.userid;
-        const ownerId = req.params.id;
-        if (tokenOwner.toString() !== ownerId.toString()) {
-          console.log("Expected:", tokenOwner);
-          console.log("Found:", ownerId);
-
-          return res.status(400).json({
-            error: "Unauthorized request.",
+        if (req.params.id) {
+          Chain.find({ _id: req.params.id }, function (err, chaindata) {
+            if (err) {
+              return res.status(400).json({
+                error: "Cannot Fetch",
+              });
+            } else {
+              return res.status(200).json({ success: "Data Found", chaindata });
+            }
           });
         } else {
-          User.find({ _id: ownerId }, function (err, owner) {
-            if (!owner) {
+          Chain.find({ userid: token.userid }, function (err, chains) {
+            if (err) {
               return res.status(400).json({
-                error:
-                  "No such user exists. Cannot show Chains without a valid owner.",
+                error: "Cannot Fetch",
               });
+            } else {
+              return res.status(200).json({ success: "Data Found", chains });
             }
-            Chain.find({ userid: ownerId }, function (err, chains) {
-              if (err) {
-                return res.status(400).json({
-                  error: "Cannot Fetch",
-                });
-              } else {
-                return res.status(200).json({ success: "Data Found", chains });
-              }
-            });
           });
         }
       }
