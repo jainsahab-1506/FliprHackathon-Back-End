@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   firstName: String,
   lastName: String,
-  mailCredentials: Object,
+  mailCredentialsId: { type: mongoose.ObjectId },
   verified: Boolean,
 });
 const tokenSchema = new mongoose.Schema({

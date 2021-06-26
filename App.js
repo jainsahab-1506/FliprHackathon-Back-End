@@ -6,7 +6,7 @@ const session = require("express-session");
 require("dotenv").config();
 
 const app = express();
-
+const cors = require("cors");
 const register = require("./authorization/register.js");
 const login = require("./authorization/login");
 const oauthloginroutes = require("./authorization/oauthlogin.js");
@@ -28,6 +28,12 @@ mongoose.connect(
   () => {
     console.log("Database connected.");
   }
+);
+app.use(
+  cors({
+    origin: process.env.SITE_URL,
+    optionsSuccessStatus: 200,
+  })
 );
 
 app.use(
