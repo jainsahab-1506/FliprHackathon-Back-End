@@ -1,9 +1,6 @@
-const { Chain, Messages } = require("./../model");
-const mongoose = require("mongoose");
-const { userSchema, tokenSchema } = require("../../model");
-const User = new mongoose.model("User", userSchema);
-const Token = new mongoose.model("Token", tokenSchema);
-const getchains = (req, res) => {
+const { get } = require("mongoose");
+const Messages = require("./../model");
+const getmessage = (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader.startsWith("Bearer ")) {
@@ -26,7 +23,7 @@ const getchains = (req, res) => {
         });
       } else {
         const tokenOwner = token.userid;
-        const ownerId = req.params.id;
+        const ownerId = req.params.ownerid;
         if (tokenOwner.toString() !== ownerId.toString()) {
           console.log("Expected:", tokenOwner);
           console.log("Found:", ownerId);
@@ -42,13 +39,15 @@ const getchains = (req, res) => {
                   "No such user exists. Cannot show Chains without a valid owner.",
               });
             }
-            Chain.find({ userid: ownerId }, function (err, chains) {
+            Messages.find({ _id: req.params.id }, function (err, message) {
               if (err) {
                 return res.status(400).json({
                   error: "Cannot Fetch",
                 });
               } else {
-                return res.status(200).json({ success: "Data Found", chains });
+                return res
+                  .status(200)
+                  .json({ success: "Message Found", message });
               }
             });
           });
@@ -59,4 +58,4 @@ const getchains = (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
-module.exports = getchains;
+module.exports = getmessage;

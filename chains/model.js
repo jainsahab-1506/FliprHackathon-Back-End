@@ -5,7 +5,7 @@ const chainSchema = new mongoose.Schema({
     type: mongoose.ObjectId,
     required: true,
   },
-  message: { type: Object, required: true },
+  messageid: { type: mongoose.ObjectId, required: true },
   userid: {
     type: mongoose.ObjectId,
     required: true,
@@ -13,4 +13,5 @@ const chainSchema = new mongoose.Schema({
   frequency: { type: Object, required: true },
   status: { type: Boolean },
 });
-module.exports = new mongoose.model("Chains", chainSchema);
+
+module.exports.Chain = new mongoose.model("Chains", chainSchema);

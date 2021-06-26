@@ -1,8 +1,10 @@
-const Chain = require("./../model");
+const { Chain } = require("./../model");
+const Messages = require("./../../messages/models.js");
 const mongoose = require("mongoose");
 const { userSchema, tokenSchema } = require("../../model");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
+
 const createchain = (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -42,13 +44,24 @@ const createchain = (req, res) => {
                   "No such user exists. Cannot show Chains without a valid owner.",
               });
             }
+            const messages = new Messages({
+              text: req.body.messagetext,
+              files: req.files,
+            });
             const chaindata = new Chain({
               chainname: req.body.chainname,
               userid: req.body.userid,
               emailgroupid: req.body.emailgroupid,
-              message: req.body.message,
+              message: messages._id,
               frequency: req.body.frequency,
               status: false,
+            });
+            messages.save(function (err, savedmessage) {
+              if (err) {
+                return res.status(400).json({
+                  error: { err },
+                });
+              }
             });
             chaindata.save(function (err, chainsaved) {
               if (err) {

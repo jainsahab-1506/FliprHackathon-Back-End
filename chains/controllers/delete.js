@@ -1,4 +1,4 @@
-const Chain = require("./../model");
+const { Chain, Messages } = require("./../model");
 const mongoose = require("mongoose");
 const { userSchema, tokenSchema } = require("../../model");
 const User = new mongoose.model("User", userSchema);
