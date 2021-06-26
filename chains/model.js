@@ -11,5 +11,6 @@ const chainSchema = new mongoose.Schema({
     required: true,
   },
   frequency: { type: Object, required: true },
+  status: { type: Boolean },
 });
 module.exports = new mongoose.model("Chains", chainSchema);

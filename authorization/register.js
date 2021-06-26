@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const findOrCreate = require("mongoose-findorcreate");
 
-const { userSchema } = require("./model");
+const { userSchema } = require("../model");
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);

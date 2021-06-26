@@ -8,6 +8,7 @@ const editchain = (req, res) => {
     emailgroupid: req.body.emailgroupid,
     message: req.body.message,
     frequency: req.body.frequency,
+    status: req.body.status,
   };
   Chain.findOneAndUpdate(
     { _id: id },
@@ -15,9 +16,13 @@ const editchain = (req, res) => {
     { new: true, omitUndefined: true, runValidators: true },
     function (err, updatedchain) {
       if (err) {
-        res.send(err);
+        return res.status(400).json({
+          error: "Cannot Update Chain",
+        });
       } else {
-        res.send(updatedchain);
+        return res
+          .status(200)
+          .json({ success: "Chain Updated.", updatedchain });
       }
     }
   );

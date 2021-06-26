@@ -7,15 +7,16 @@ require("dotenv").config();
 
 const app = express();
 
-const register = require("./register");
-const login = require("./login");
-const oauthloginroutes = require("./oauthlogin.js");
-const logoutroutes = require("./logout.js");
+const register = require("./authorization/register.js");
+const login = require("./authorization/login");
+const oauthloginroutes = require("./authorization/oauthlogin.js");
+const logoutroutes = require("./authorization/logout.js");
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyparser.json());
 const emailGroupRouter = require("./email-group/routes");
 const ChainRouter = require("./chains/routes.js");
+const UserRouter = require("./users/routes.js");
 
 mongoose.connect(
   "mongodb+srv://admin-naman:" +
@@ -52,6 +53,8 @@ app.use("/", logoutroutes);
 app.use("/email-group/:id", emailGroupRouter);
 
 app.use("/chains", ChainRouter);
+
+app.use("/users", UserRouter);
 
 app.listen(process.env.PORT || 3000, function (req, res) {
   console.log("Running");

@@ -6,9 +6,11 @@ const userSchema = new mongoose.Schema({
   email: String,
   firstName: String,
   lastName: String,
+  mailCredentials: Object,
+  verified: Boolean,
 });
 const tokenSchema = new mongoose.Schema({
-  userid: mongoose.ObjectId,
+  userid: { type: mongoose.ObjectId, unique: true, index: true },
   token: String,
 });
 

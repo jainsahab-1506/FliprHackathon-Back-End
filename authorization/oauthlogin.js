@@ -7,13 +7,11 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
 
-const { userSchema, tokenSchema } = require("./model");
+const { userSchema, tokenSchema } = require("../model");
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 const User = new mongoose.model("User", userSchema);
-tokenSchema.plugin(passportLocalMongoose);
-tokenSchema.plugin(findOrCreate);
 
 const Token = new mongoose.model("Token", tokenSchema);
 passport.use(User.createStrategy());
@@ -27,7 +25,7 @@ passport.deserializeUser(function (id, done) {
     done(err, user);
   });
 });
-var userprofile;
+var userprofile, authtoken;
 passport.use(
   new GoogleStrategy(
     {
@@ -37,9 +35,8 @@ passport.use(
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
     function (accessToken, refreshToken, profile, cb) {
-      console.log(profile.emails);
       var newUserName = profile.name.givenName + profile.id;
-
+      authtoken = accessToken;
       User.findOrCreate(
         {
           googleId: profile.id,
@@ -47,13 +44,11 @@ passport.use(
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
           email: profile.emails[0].value,
+          password: "",
+          verified: false,
         },
         function (err, user) {
-          const data = new Token({
-            userid: user._id,
-            token: accessToken,
-          });
-          data.save();
+          userprofile = user;
 
           return cb(err, user);
         }
@@ -72,7 +67,18 @@ router.get(
     failureRedirect: "/",
   }),
   function (req, res) {
-    res.send(userprofile);
+    var tokendata = new Token({
+      token: authtoken,
+      userid: userprofile._id,
+    });
+    console.log(tokendata);
+    tokendata.save(function (err, auth) {
+      if (err) {
+        console.log(err);
+        return res.status(400).json({ error: err });
+      }
+      return res.status(200).json({ success: "Logged In Successfully.", auth });
+    });
 
     // Successful authentication, redirect to secrets.
   }
