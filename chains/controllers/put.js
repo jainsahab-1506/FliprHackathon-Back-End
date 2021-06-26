@@ -40,6 +40,7 @@ const authorizeUpdate = (req, res, next) => {
 					});
 				} else {
 					const id = req.params.id;
+					
 					const chaindata = {
 						chainname: req.body.chainname,
 						userid: req.body.userid,

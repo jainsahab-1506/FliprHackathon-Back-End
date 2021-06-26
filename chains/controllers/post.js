@@ -64,8 +64,9 @@ const createchain = (req, res) => {
       });
       const freqgiven = req.body.frequency;
       if (
-        (freqgiven.type == freq[0] && freqgiven.time < 20) ||
-        freqgiven.time > 30
+        freqgiven.type == freq[0] &&
+        freqgiven.time != 20 &&
+        freqgiven.time != 30
       ) {
         return res.status(400).json({
           error: "Frequency is not Valid",
