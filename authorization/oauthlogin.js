@@ -71,13 +71,23 @@ router.get(
       token: authtoken,
       userid: userprofile._id,
     });
-    console.log(tokendata);
+
     tokendata.save(function (err, auth) {
       if (err) {
-        console.log(err);
-        return res.status(400).json({ error: err });
+        console.log(userprofile._id);
+        Token.findOne({ userid: userprofile._id }, function (error, resp) {
+          console.log(resp);
+          if (resp) {
+            return res.status(400).json({ error: "User Already Logged In " });
+          } else {
+            return res.status(400).json({ error: "Internal Server Error " });
+          }
+        });
+      } else {
+        return res
+          .status(200)
+          .json({ success: "Logged In Successfully.", auth });
       }
-      return res.status(200).json({ success: "Logged In Successfully.", auth });
     });
 
     // Successful authentication, redirect to secrets.
