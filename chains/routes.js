@@ -5,9 +5,9 @@ const deletechain = require("./controllers/delete.js");
 const editchain = require("./controllers/put.js");
 const getchains = require("./controllers/get.js");
 
-router.delete("/:id", deletechain);
+router.delete("/:id/:ownerid", deletechain);
 router.get("/:id", getchains);
-router.post("/", createchain);
-router.put("/:id", editchain);
+router.post("/:ownerid", createchain);
+router.put("/:id/:ownerid", editchain);
 
 module.exports = router;
