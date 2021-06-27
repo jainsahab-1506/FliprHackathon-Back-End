@@ -35,7 +35,7 @@ const authorizeUpdate = (req, res, next) => {
           const chaindata = {
             chainname: chain.chainname,
             userid: chain.userid,
-            emailid: chain.emailid,
+            emailgroupid: chain.emailgroupid,
             messageid: chain.messageid,
             frequency: chain.frequency,
             status: chain.status,
