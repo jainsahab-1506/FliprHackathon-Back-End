@@ -31,7 +31,7 @@ const editEmailGroup = async (req, res) => {
 		const tokenOwner = token.userid;
 
 		const newEmailGroupData = req.body;
-		const emailGroupId = newEmailGroupData.id;
+		const emailGroupId = req.params.id;
 		const emailGroup = await EmailGroup.findById(emailGroupId);
 
 		if (!emailGroup) {
