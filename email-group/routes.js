@@ -8,6 +8,6 @@ const getEmailGroup = require('./controllers/get.js');
 router.delete('/:id', deleteEmailGroup);
 router.get('/:id?', getEmailGroup);
 router.post('/', createEmailGroup);
-router.put('/', editEmailGroup);
+router.put('/:id', editEmailGroup);
 
 module.exports = router;
