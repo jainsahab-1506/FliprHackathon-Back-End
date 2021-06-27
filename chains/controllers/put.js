@@ -30,11 +30,11 @@ const authorizeUpdate = (req, res, next) => {
         });
       } else {
         const id = req.params.id;
-        console.log(emailgroupid);
+        console.log(req.body);
         const chaindata = {
           chainname: req.body.chainname,
           userid: req.body.userid,
-          emailgroupid: req.body.emailgroupid,
+          emailgroupid: req.body.emailgroupid._id,
           messageid: req.body.messageid._id,
           frequency: req.body.frequency,
           status: req.body.status,
