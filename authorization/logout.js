@@ -26,7 +26,7 @@ router.delete("/logout", function (req, res) {
           error: "Unauthorized request.",
         });
       } else {
-        Token.deleteOne({ userid: token.userid }, function (err) {
+        Token.delete({ token: tokenData }, function (err) {
           if (err) {
             return res.status(400).json({ error: err });
           } else {
