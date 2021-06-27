@@ -7,54 +7,49 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
 const credentialsSchema = require("./models.js");
-credentialsSchema.plugin(passportLocalMongoose);
-credentialsSchema.plugin(findOrCreate);
+
 const Credentials = new mongoose.model("Credentials", credentialsSchema);
-passport.serializeUser(function (cred, done) {
-  done(null, cred.id);
-});
+const { tokenSchema } = require("./models.js");
 
-passport.deserializeUser(function (id, done) {
-  Credentials.findById(id, function (err, cred) {
-    done(err, cred);
-  });
-});
-var id;
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/addemail",
-      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
-    },
-    function (accessToken, refreshToken, profile, cb) {
-      Credentials.findOrCreate(
-        {
-          email: profile.emails[0].value,
-          token: accessToken,
-        },
-        function (err, cred) {
-          id = cred._id;
+const Token = new mongoose.model("Token", tokenSchema);
 
-          return cb(err, cred);
-        }
-      );
-    }
-  )
-);
-router.get(
-  "/auth/google/add",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-router.get(
-  "/auth/google/addemail",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    failureRedirect: "/",
-  }),
+router.post(
+  "/addemail",
+
   function (req, res) {
-    return res.status(200).json({ Success: "Authorization Done", id: id });
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader.startsWith("Bearer ")) {
+        return res.status(400).json({
+          error: "Invalid request headers.",
+        });
+      }
+      const tokenData = authHeader.split(" ")[1];
+      if (!tokenData) {
+        return res.status(400).json({
+          error: "Invalid token.",
+        });
+      }
+
+      Token.findOne({ token: tokenData }, function (err, token) {
+        if (!token) {
+          return res.status(400).json({
+            error: "Invalid token.",
+          });
+        } else {
+          const cred = new Credentials({
+            email: req.body.email,
+            token: req.body.token,
+          });
+          return res
+            .status(200)
+            .json({ Success: "Authorization Done", id: cred._id });
+        }
+      });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
     // Successful authentication, redirect to secrets.
   }
 );
