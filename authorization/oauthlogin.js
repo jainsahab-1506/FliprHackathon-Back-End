@@ -90,7 +90,6 @@ router.post("/oauthlogin", function (req, res) {
       });
     }
   );
-  res.send("Done");
 
   // Successful authentication, redirect to secrets.
 });
