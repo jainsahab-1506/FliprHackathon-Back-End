@@ -51,32 +51,46 @@ var userprofile, authtoken;
 //   passport.authenticate("google", { scope: ["profile", "email"] })
 // );
 router.post("/oauthlogin", function (req, res) {
-  console.log(req.body.accessToken);
-  console.log(req.body.profileObj);
-  res.send("Done");
-  // var tokendata = new Token({
-  //   token: authtoken,
-  //   userid: userprofile._id,
-  // });
+  const token = req.body.accessToken;
+  const profile = req.body.profileObj;
+  var newUserName = profile.givenName + profile.googleId;
+  User.findOrCreate(
+    {
+      googleId: profile.googleId,
+      username: newUserName,
+      firstName: profile.givenName,
+      lastName: profile.familyName,
+      email: profile.email,
+      password: "",
+      verified: false,
+    },
+    function (err, user) {
+      var tokendata = new Token({
+        token: token,
+        userid: user._id,
+      });
 
-  // tokendata.save(function (err, auth) {
-  //   if (err) {
-  //     Token.findOne({ userid: userprofile._id }, function (error, resp) {
-  //       console.log(resp);
-  //       if (resp) {
-  //         return res.status(400).json({ error: "User Already Logged In " });
-  //       } else {
-  //         return res.status(400).json({ error: "Internal Server Error " });
-  //       }
-  //     });
-  //   } else {
-  //     return res.status(200).json({
-  //       success: "Logged In Successfully.",
-  //       token: auth.token,
-  //       profile: userprofile,
-  //     });
-  //   }
-  // });
+      tokendata.save(function (err, auth) {
+        if (err) {
+          Token.findOne({ userid: user._id }, function (error, resp) {
+            console.log(resp);
+            if (resp) {
+              return res.status(400).json({ error: "User Already Logged In " });
+            } else {
+              return res.status(400).json({ error: "Internal Server Error " });
+            }
+          });
+        } else {
+          return res.status(200).json({
+            success: "Logged In Successfully.",
+            token: token,
+            profile: user,
+          });
+        }
+      });
+    }
+  );
+  res.send("Done");
 
   // Successful authentication, redirect to secrets.
 });
