@@ -34,11 +34,12 @@ const authorizeUpdate = (req, res, next) => {
         const chaindata = {
           chainname: req.body.chainname,
           userid: req.body.userid,
-          emailgroupid: req.body.emailgroupid,
-          messageid: req.body.messageid,
+          emailgroupid: req.body.emailgroupid._id,
+          messageid: req.body.messageid._id,
           frequency: req.body.frequency,
           status: req.body.status,
         };
+
         Chain.findOneAndUpdate(
           { _id: id },
           chaindata,
@@ -64,8 +65,8 @@ const editchain = async (req, res) => {
   try {
     const id = req.params.id;
     const chain = await Chain.findById(id);
-
-    const messageId = chain.messageid;
+    console.log(req.body, req.files);
+    const messageId = chain.messageid._id;
     const message = await Messages.findOneAndUpdate(
       { _id: messageId },
       { text: req.body.messageid.text, attachments: req.files },
@@ -74,7 +75,7 @@ const editchain = async (req, res) => {
 
     return res.status(200).json({ success: "Chain updated.", chain });
   } catch (error) {
-    return res.status(400).json({ error: "" });
+    return res.status(400).json({ error: "Fetch Error" });
   }
 };
 
