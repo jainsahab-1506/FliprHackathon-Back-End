@@ -39,19 +39,20 @@ const authorizeRequest = (req, res, next) => {
 
 const createchain = (req, res) => {
   try {
-    User.find({ _id: req.body.userid }, function (err, owner) {
+    const chain = JSON.parse(req.body.body);
+    User.find({ _id: chain.userid }, function (err, owner) {
       if (!owner) {
         return res.status(400).json({
           error:
             "No such user exists. Cannot show Chains without a valid owner.",
         });
       }
-
+      const chain = JSON.parse(req.body.body);
       const messages = new Messages({
-        text: req.body.messageid.text,
+        text: chain.messageid.text,
         attachments: req.files,
       });
-      const freqgiven = req.body.frequency;
+      const freqgiven = chain.frequency;
       if (
         freqgiven.period == freq[0] &&
         freqgiven.repeat != 20 &&
@@ -72,11 +73,11 @@ const createchain = (req, res) => {
         });
       }
       const chaindata = new Chain({
-        chainname: req.body.chainname,
-        userid: req.body.userid,
-        emailgroupid: req.body.emailgroupid,
+        chainname: chain.chainname,
+        userid: chain.userid,
+        emailgroupid: chain.emailgroupid,
         messageid: messages._id,
-        frequency: req.body.frequency,
+        frequency: chain.frequency,
         status: false,
       });
 
