@@ -28,7 +28,6 @@ const getchains = async (req, res) => {
           error: "Unauthorized request.",
         });
       } else {
-        console.log(req.params.id);
         if (req.params.id) {
           const chaindata = await Chain.findOne({
             _id: req.params.id,

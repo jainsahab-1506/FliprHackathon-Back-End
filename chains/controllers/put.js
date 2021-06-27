@@ -31,7 +31,7 @@ const authorizeUpdate = (req, res, next) => {
       } else {
         const id = req.params.id;
         req.on("data", function (data) {
-          const chain = JSON.parse(data);
+          const chain = data;
           const chaindata = {
             chainname: chain.chainname,
             userid: chain.userid,
@@ -68,7 +68,7 @@ const editchain = async (req, res) => {
     const id = req.params.id;
     const chain = await Chain.findById(id);
     req.on("data", async function (data) {
-      const chains = JSON.parse(data);
+      const chains = data;
       const messageId = chain.messageid;
       const message = await Messages.findOneAndUpdate(
         { _id: messageId },
