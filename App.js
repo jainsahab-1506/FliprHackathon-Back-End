@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const session = require("express-session");
 require("dotenv").config();
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+module.exports.upload = upload;
 
 const app = express();
 const cors = require("cors");
@@ -14,6 +17,7 @@ const logoutroutes = require("./authorization/logout.js");
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyparser.json());
+app.use(upload.any());
 const emailGroupRouter = require("./email-group/routes");
 const ChainRouter = require("./chains/routes.js");
 const UserRouter = require("./users/routes.js");
@@ -66,6 +70,6 @@ app.use("/users", UserRouter);
 app.use("/messages", MessageRouter);
 app.use("/", MailRouter);
 
-app.listen(process.env.PORT || 3000, function (req, res) {
+app.listen(process.env.PORT || 8000, function (req, res) {
   console.log("Running");
 });
