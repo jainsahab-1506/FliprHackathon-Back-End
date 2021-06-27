@@ -67,7 +67,7 @@ const editchain = async (req, res) => {
   try {
     const id = req.params.id;
     const chain = await Chain.findById(id);
-    req.on("data", function (data) {
+    req.on("data", async function (data) {
       const chains = JSON.parse(data);
       const messageId = chain.messageid;
       const message = await Messages.findOneAndUpdate(
