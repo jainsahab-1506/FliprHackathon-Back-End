@@ -40,7 +40,7 @@ const getEmailGroup = async (req, res) => {
 		} else {
 			const emailGroup = await EmailGroup.findById(emailGroupId);
 
-			if (emailGroup.owner === tokenOwner) {
+			if (emailGroup.owner.toString() === tokenOwner.toString()) {
 				return res.status(200).json(emailGroup);
 			} else {
 				return res.status(400).json('You do not own this email group.');
