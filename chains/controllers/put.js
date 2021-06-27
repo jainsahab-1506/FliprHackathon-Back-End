@@ -66,7 +66,7 @@ const editchain = async (req, res) => {
     const chain = await Chain.findById(id);
 
     const messageId = chain.messageid;
-    const message = await Message.findOneAndUpdate(
+    const message = await Messages.findOneAndUpdate(
       { _id: messageId },
       { text: req.body.messageid.text, attachments: req.files },
       { new: true, omitUndefined: true, runValidators: true }
@@ -74,7 +74,7 @@ const editchain = async (req, res) => {
 
     return res.status(200).json({ success: "Chain updated.", chain });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: "" });
   }
 };
 
