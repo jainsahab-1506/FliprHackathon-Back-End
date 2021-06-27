@@ -30,30 +30,32 @@ const authorizeUpdate = (req, res, next) => {
         });
       } else {
         const id = req.params.id;
-        console.log(req.body);
-        const chaindata = {
-          chainname: req.body.chainname,
-          userid: req.body.userid,
-          emailgroupid: req.body.emailgroupid._id,
-          messageid: req.body.messageid._id,
-          frequency: req.body.frequency,
-          status: req.body.status,
-        };
+        req.on("data", function (data) {
+          const chain = JSON.parse(data);
+          const chaindata = {
+            chainname: chain.chainname,
+            userid: chain.userid,
+            emailid: chain.emailid,
+            messageid: chain.messageid,
+            frequency: chain.frequency,
+            status: chain.status,
+          };
 
-        Chain.findOneAndUpdate(
-          { _id: id },
-          chaindata,
-          { new: true, omitUndefined: true, runValidators: true },
-          function (err, updatedchain) {
-            if (err) {
-              return res.status(400).json({
-                error: "Cannot Update Chain",
-              });
-            } else {
-              next();
+          Chain.findOneAndUpdate(
+            { _id: id },
+            chaindata,
+            { new: true, omitUndefined: true, runValidators: true },
+            function (err, updatedchain) {
+              if (err) {
+                return res.status(400).json({
+                  error: "Cannot Update Chain",
+                });
+              } else {
+                next();
+              }
             }
-          }
-        );
+          );
+        });
       }
     });
   } catch (error) {
@@ -65,15 +67,17 @@ const editchain = async (req, res) => {
   try {
     const id = req.params.id;
     const chain = await Chain.findById(id);
-    console.log(req.body, req.files);
-    const messageId = chain.messageid._id;
-    const message = await Messages.findOneAndUpdate(
-      { _id: messageId },
-      { text: req.body.messageid.text, attachments: req.files },
-      { new: true, omitUndefined: true, runValidators: true }
-    );
+    req.on("data", function (data) {
+      const chains = JSON.parse(data);
+      const messageId = chain.messageid;
+      const message = await Messages.findOneAndUpdate(
+        { _id: messageId },
+        { text: chains.text, attachments: req.files },
+        { new: true, omitUndefined: true, runValidators: true }
+      );
 
-    return res.status(200).json({ success: "Chain updated.", chain });
+      return res.status(200).json({ success: "Chain updated.", chain });
+    });
   } catch (error) {
     return res.status(400).json({ error: "Fetch Error" });
   }
