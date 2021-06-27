@@ -51,7 +51,8 @@ var userprofile, authtoken;
 //   passport.authenticate("google", { scope: ["profile", "email"] })
 // );
 router.post("/oauthlogin", function (req, res) {
-  console.log(req.body);
+  console.log(req.body.accessToken);
+  console.log(req.body.profileObj);
   res.send("Done");
   // var tokendata = new Token({
   //   token: authtoken,
