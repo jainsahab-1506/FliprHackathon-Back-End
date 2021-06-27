@@ -48,24 +48,24 @@ const createchain = (req, res) => {
       }
 
       const messages = new Messages({
-        text: req.body.messagetext,
+        text: req.body.messageid.text,
         attachments: req.files,
       });
       const freqgiven = req.body.frequency;
       if (
-        freqgiven.type == freq[0] &&
-        freqgiven.time != 20 &&
-        freqgiven.time != 30
+        freqgiven.period == freq[0] &&
+        freqgiven.repeat != 20 &&
+        freqgiven.repeat != 30
       ) {
         return res.status(400).json({
           error: "Frequency is not Valid",
         });
       }
       if (
-        freqgiven != freq[0] &&
-        freqgiven != freq[1] &&
-        freqgiven != freq[2] &&
-        freqgiven != freq[3]
+        freqgiven.period != freq[0] &&
+        freqgiven.period != freq[1] &&
+        freqgiven.period != freq[2] &&
+        freqgiven.period != freq[3]
       ) {
         return res.status(400).json({
           error: "Frequency is not Valid",

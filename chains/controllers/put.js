@@ -29,15 +29,13 @@ const authorizeUpdate = (req, res, next) => {
           error: "Invalid token.",
         });
       } else {
-        const tokenOwner = token.userid;
-
         const id = req.params.id;
 
         const chaindata = {
           chainname: req.body.chainname,
           userid: req.body.userid,
           emailgroupid: req.body.emailgroupid,
-          message: req.body.message,
+          messageid: req.body.messageid,
           frequency: req.body.frequency,
           status: req.body.status,
         };
@@ -70,7 +68,7 @@ const editchain = async (req, res) => {
     const messageId = chain.messageid;
     const message = await Message.findOneAndUpdate(
       { _id: messageId },
-      { text: req.body.message, attachments: req.files },
+      { text: req.body.messageid.text, attachments: req.files },
       { new: true, omitUndefined: true, runValidators: true }
     );
 
