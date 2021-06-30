@@ -78,8 +78,11 @@ const editchain = async (req, res) => {
     const chains = JSON.parse(req.body.body);
     const messageId = chains.messageid._id;
     const message = await Messages.findOneAndUpdate(
-      { _id: messageId._id },
-      { text: chains.messageid.text, attachments: req.files },
+      { _id: messageId },
+      { 
+        text: chains.messageid.text,
+        attachments: req.files.length>0 ? req.files : chains.messageid.attachments 
+      },
       { new: true, omitUndefined: true, runValidators: true }
     );
     const chain = await Chain.findById(id).populate("messageid");

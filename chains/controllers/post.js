@@ -6,7 +6,7 @@ const { userSchema, tokenSchema } = require("../../model");
 
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
-const freq = ["Daily", "Weekly", "Monthly", "Yearly"];
+const freq = ["Recurring", "Weekly", "Monthly", "Yearly"];
 const authorizeRequest = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -40,14 +40,14 @@ const authorizeRequest = (req, res, next) => {
 const createchain = (req, res) => {
   try {
     const chain = JSON.parse(req.body.body);
+    console.log(chain);
     User.find({ _id: chain.userid }, function (err, owner) {
       if (!owner) {
         return res.status(400).json({
           error:
-            "No such user exists. Cannot show Chains without a valid owner.",
+            "No such user exists. Cannot create chains without a valid owner.",
         });
       }
-      const chain = JSON.parse(req.body.body);
       const messages = new Messages({
         text: chain.messageid.text,
         attachments: req.files,
@@ -78,7 +78,7 @@ const createchain = (req, res) => {
         emailgroupid: chain.emailgroupid,
         messageid: messages._id,
         frequency: chain.frequency,
-        status: false,
+        status: chain.status,
       });
 
       messages.save(function (err, savedmessage) {
