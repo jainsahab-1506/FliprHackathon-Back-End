@@ -5,10 +5,26 @@ const credentialsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  token: {
+  access_token: {
     type: String,
     required: true,
   },
+  refresh_token: {
+    type: String,
+    required: true,
+  },
+  expiry_time: {
+    type: Number,
+    required: true,
+  },
+  creation_time: {
+    type: String,
+    required: true,
+  },
+  userid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
-module.exports = credentialsSchema;
+module.exports = new mongoose.model("Credentials", credentialsSchema);

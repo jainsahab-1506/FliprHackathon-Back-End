@@ -72,16 +72,18 @@ const authorizeUpdate = (req, res, next) => {
 const editchain = async (req, res) => {
   try {
     const id = req.params.id;
-    
+
     // req.on("data", async function (data) {
     console.log(req.files);
     const chains = JSON.parse(req.body.body);
     const messageId = chains.messageid._id;
+
     const message = await Messages.findOneAndUpdate(
       { _id: messageId },
-      { 
+      {
         text: chains.messageid.text,
-        attachments: req.files.length>0 ? req.files : chains.messageid.attachments 
+        attachments:
+          req.files.length > 0 ? req.files : chains.messageid.attachments,
       },
       { new: true, omitUndefined: true, runValidators: true }
     );

@@ -50,46 +50,54 @@ var userprofile, authtoken;
 //   "/auth/google",
 //   passport.authenticate("google", { scope: ["profile", "email"] })
 // );
-router.post("/oauthlogin", function (req, res) {
-  const token = req.body.accessToken;
-  const profile = req.body.profileObj;
-  var newUserName = profile.givenName + profile.googleId;
-  User.findOrCreate(
-    {
-      googleId: profile.googleId,
-      username: newUserName,
-      firstName: profile.givenName,
-      lastName: profile.familyName,
-      email: profile.email,
-      password: "",
-      verified: false,
-    },
-    function (err, user) {
+router.post("/oauthlogin", async function (req, res) {
+  try {
+    const token = req.body.accessToken;
+    const profile = req.body.profileObj;
+    var newUserName = profile.givenName + profile.googleId;
+    const user = await User.findOne({ googleId: profile.googleId }).populate(
+      "mailCredentialsId"
+    );
+    console.log(user);
+    if (user) {
       var tokendata = new Token({
         token: token,
         userid: user._id,
       });
+      await Token.deleteMany({ userid: user._id });
+      await tokendata.save();
+      return res.status(200).json({
+        success: "Logged In Successfully.",
+        token: token,
+        profile: user,
+      });
+    } else {
+      const newuser = new User({
+        googleId: profile.googleId,
+        username: newUserName,
+        firstName: profile.givenName,
+        lastName: profile.familyName,
+        email: profile.email,
+        password: "",
+        verified: false,
+        mailCredentialsId: "",
+      });
+      await newuser.save();
+      var tokendata = new Token({
+        token: token,
+        userid: newuser._id,
+      });
 
-      tokendata.save(function (err, auth) {
-        if (err) {
-          Token.findOne({ userid: user._id }, function (error, resp) {
-            console.log(resp);
-            if (resp) {
-              return res.status(400).json({ error: "User Already Logged In " });
-            } else {
-              return res.status(400).json({ error: "Internal Server Error " });
-            }
-          });
-        } else {
-          return res.status(200).json({
-            success: "Logged In Successfully.",
-            token: token,
-            profile: user,
-          });
-        }
+      await tokendata.save();
+      return res.status(200).json({
+        success: "Logged In Successfully.",
+        token: token,
+        profile: newuser,
       });
     }
-  );
+  } catch (error) {
+    return res.status(400).json({ Error: error.message });
+  }
 
   // Successful authentication, redirect to secrets.
 });

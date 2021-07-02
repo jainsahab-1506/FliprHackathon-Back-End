@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const credentialsSchema = require("./../models");
-const Credential = new mongoose.model("Credential", credentialsSchema);
+const Credential = require("./../models");
+
 const { userSchema, tokenSchema } = require("../../model");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);

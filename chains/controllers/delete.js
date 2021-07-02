@@ -20,25 +20,22 @@ const deletechain = (req, res) => {
       });
     }
 
-    Token.findOne({ token: tokenData }, function (err, token) {
+    Token.findOne({ token: tokenData }, async function (err, token) {
       if (!token) {
         return res.status(400).json({
           error: "Invalid token.",
         });
       } else {
-        const tokenOwner = token.userid;
-
-        Chain.deleteOne({ _id: id }, function (err) {
-          if (err) {
-            return res.status(400).json({
-              error: "Unable to delete",
-            });
-          } else {
-            return res
-              .status(200)
-              .json({ success: "Chain Successfully Deleted." });
-          }
-        });
+        try {
+          await Chain.deleteOne({ _id: id });
+          return res
+            .status(200)
+            .json({ success: "Chain Successfully Deleted." });
+        } catch (err) {
+          return res.status(400).json({
+            error: "Unable to delete",
+          });
+        }
       }
     });
   } catch (error) {

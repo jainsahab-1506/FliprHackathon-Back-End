@@ -23,7 +23,9 @@ const ChainRouter = require("./chains/routes.js");
 const UserRouter = require("./users/routes.js");
 const MessageRouter = require("./messages/routes.js");
 const MailRouter = require("./users/mailcredentials.js");
-
+const MailerRouter = require("././Mailer/routes");
+var CronJobManager = require("cron-job-manager");
+manager = new CronJobManager();
 mongoose.connect(
   "mongodb+srv://admin-naman:" +
     process.env.CLUSTER_PASSWORD +
@@ -69,6 +71,16 @@ app.use("/chains", ChainRouter);
 app.use("/users", UserRouter);
 app.use("/messages", MessageRouter);
 app.use("/", MailRouter);
+app.use("/", MailerRouter);
+app.post("/cron", function (req, res) {
+  manager.add("next_job", "*/10 * * * * *", () => {
+    console.log("tick...");
+  });
+  manager.start("next_job");
+});
+app.post("/cronstop", function (req, res) {
+  manager.stop("next_job");
+});
 
 app.listen(process.env.PORT || 8000, function (req, res) {
   console.log("Running");

@@ -4,7 +4,7 @@ const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
 const { tokenSchema } = require("../model");
 const Token = new mongoose.model("Token", tokenSchema);
-router.delete("/logout", function (req, res) {
+router.delete("/logout", async function (req, res) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader.startsWith("Bearer ")) {
@@ -19,24 +19,14 @@ router.delete("/logout", function (req, res) {
         error: "Invalid token.",
       });
     }
-
-    Token.findOne({ token: tokenData }, function (err, token) {
-      if (!token) {
-        return res.status(400).json({
-          error: "Unauthorized request.",
-        });
-      } else {
-        Token.deleteOne({ token: tokenData }, function (err) {
-          if (err) {
-            return res.status(400).json({ error: err });
-          } else {
-            return res
-              .status(200)
-              .json({ success: "Logged Out Successfully." });
-          }
-        });
-      }
-    });
+    const token = await Token.findOne({ token: tokenData });
+    if (!token) {
+      return res.status(400).json({
+        error: "Unauthorized request.",
+      });
+    }
+    await Token.deleteOne({ token: tokenData });
+    return res.status(200).json({ success: "Logged Out Successfully." });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
