@@ -25,6 +25,10 @@ const credentialsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  name: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = new mongoose.model("Credentials", credentialsSchema);

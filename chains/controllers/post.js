@@ -3,7 +3,11 @@ const mongoose = require("mongoose");
 const { Chain } = require("./../model");
 const { Messages } = require("./../../messages/models");
 const { userSchema, tokenSchema } = require("../../model");
-
+const fs = require("fs");
+var FormData = require("form-data");
+var mime = require("mime-types");
+const calculatefrequency = require("../../utils/calculatefrequency");
+const axios = require("axios");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
 const freq = ["Recurring", "Weekly", "Monthly", "Yearly"];
@@ -22,7 +26,7 @@ const authorizeRequest = (req, res, next) => {
         error: "Invalid token.",
       });
     }
-
+    console.log(tokenData);
     Token.findOne({ token: tokenData }, function (err, token) {
       if (!token) {
         return res.status(400).json({
@@ -37,8 +41,25 @@ const authorizeRequest = (req, res, next) => {
   }
 };
 
-const createchain = (req, res) => {
+const createchain = async (req, res) => {
   try {
+    console.log(req.files);
+    var fd = new FormData();
+    req.files.forEach((file) => {
+      var data = fs.createReadStream(process.env.PWD + "/" + file.path);
+      fd.append("files", data);
+    });
+    // console.log(fd);
+    var resp = await axios({
+      method: "post",
+      url: process.env.SERVER_URL1 + "/uploadfiles",
+      data: fd,
+      headers: {
+        "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
+      },
+    });
+    const authHeader = req.headers.authorization;
+    const tokenData = authHeader.split(" ")[1];
     const chain = JSON.parse(req.body.body);
     console.log(chain);
     User.find({ _id: chain.userid }, function (err, owner) {
@@ -55,8 +76,8 @@ const createchain = (req, res) => {
       const freqgiven = chain.frequency;
       if (
         freqgiven.period == freq[0] &&
-        freqgiven.repeat != 20 &&
-        freqgiven.repeat != 30
+        freqgiven.seconds != 20 &&
+        freqgiven.seconds != 30
       ) {
         return res.status(400).json({
           error: "Frequency is not Valid",
@@ -80,7 +101,7 @@ const createchain = (req, res) => {
         frequency: chain.frequency,
         status: chain.status,
       });
-
+      var newfrequency;
       messages.save(function (err, savedmessage) {
         if (err) {
           return res.status(400).json({
@@ -90,19 +111,45 @@ const createchain = (req, res) => {
         console.log(savedmessage);
       });
 
-      chaindata.save(function (err, chainsaved) {
+      chaindata.save(async function (err, chainsaved) {
         if (err) {
           return res.status(400).json({
             error: { err },
           });
         } else {
-          return res
-            .status(200)
-            .json({ success: "Chain Created.", chainsaved });
+          var fd = newFormData();
+          req.file.forEach((file) => {
+            var data = fs.readFileSync(process.env.PWD + "/" + file.path);
+            fd.append(data);
+          });
+          console.log(fd);
+          try {
+            resp = await axios({
+              method: "POST",
+              url: process.env.SERVER_URL1 + "/createcron",
+
+              data: {
+                frequency: "*/20 * * * * *",
+                status: chaindata.status,
+                id: chaindata._id,
+              },
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + tokenData,
+              },
+            });
+
+            return res
+              .status(200)
+              .json({ success: "Chain Created.", chainsaved });
+          } catch (err) {
+            return res.status(400).json({ err: err.message });
+          }
         }
       });
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ error: error.message });
   }
 };

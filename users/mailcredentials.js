@@ -15,7 +15,7 @@ const User = new mongoose.model("User", userSchema);
 
 const Token = new mongoose.model("Token", tokenSchema);
 
-router.post("/addemail", function (req, res) {
+router.post("/addmailcred", function (req, res) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader.startsWith("Bearer ")) {
@@ -71,6 +71,7 @@ router.post("/addemail", function (req, res) {
             expiry_time: time + resp.data.expires_in,
             creation_time: new Date(),
             userid: token.userid,
+            name: profres.name,
           });
           console.log(time + 3600);
           await credentials.save();
@@ -82,7 +83,7 @@ router.post("/addemail", function (req, res) {
           updateduser = await User.findOne({
             _id: token.userid,
           }).populate("mailCredentialsId");
-          return res.status(200).json(updateduser);
+          return res.status(200).json(updateduser.mailCredentialsId);
         } catch (error) {
           return res.status(400).json({ Error: error.message });
         }
