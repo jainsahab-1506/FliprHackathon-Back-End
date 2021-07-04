@@ -32,10 +32,10 @@ const getcred = (req, res) => {
           if (!owner) {
             return res.status(400).json({
               error:
-                "No such user exists. Cannot show Chains without a valid owner.",
+                "No such user exists. Cannot show Send Credentials without a valid owner.",
             });
           }
-          Credential.find({ _id: req.params.id }, function (err, credential) {
+          Credential.find({ _id: tokenOwner }, function (err, credential) {
             if (err) {
               return res.status(400).json({
                 error: "Cannot Fetch",

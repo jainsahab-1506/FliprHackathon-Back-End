@@ -101,7 +101,7 @@ const createchain = async (req, res) => {
         frequency: chain.frequency,
         status: chain.status,
       });
-      var newfrequency;
+      var newfrequency = calculatefrequency(chain.frequency);
       messages.save(function (err, savedmessage) {
         if (err) {
           return res.status(400).json({
@@ -129,7 +129,7 @@ const createchain = async (req, res) => {
               url: process.env.SERVER_URL1 + "/createcron",
 
               data: {
-                frequency: "*/20 * * * * *",
+                frequency: newfrequency,
                 status: chaindata.status,
                 id: chaindata._id,
               },

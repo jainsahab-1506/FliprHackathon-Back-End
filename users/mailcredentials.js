@@ -71,7 +71,7 @@ router.post("/addmailcred", function (req, res) {
             expiry_time: time + resp.data.expires_in,
             creation_time: new Date(),
             userid: token.userid,
-            name: profres.name,
+            name: profres.data.name,
           });
           console.log(time + 3600);
           await credentials.save();
@@ -85,11 +85,13 @@ router.post("/addmailcred", function (req, res) {
           }).populate("mailCredentialsId");
           return res.status(200).json(updateduser.mailCredentialsId);
         } catch (error) {
+          console.log(error);
           return res.status(400).json({ Error: error.message });
         }
       }
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ error: error.message });
   }
 

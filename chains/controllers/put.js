@@ -4,6 +4,7 @@ const { Chain } = require("./../model");
 const { Messages } = require("./../../messages/models");
 const { userSchema, tokenSchema } = require("../../model");
 const fs = require("fs");
+const calculatefrequency = require("../../utils/calculatefrequency");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
 var prevstatus;
@@ -99,9 +100,9 @@ const editchain = async (req, res) => {
         url: process.env.SERVER_URL1 + "/updatecron",
 
         data: {
-          frequency: newfrequency,
-          id: chaindata._id,
-          status: chainsdata.status,
+          frequency: calculatefrequency(chains.frequency),
+          id: chains._id,
+          status: chains.status,
         },
         headers: {
           "Content-Type": "application/json",
