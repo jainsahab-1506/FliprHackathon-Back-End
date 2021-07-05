@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
-
+const axios = require("axios");
 const { Chain } = require("./../model");
 const { Messages } = require("./../../messages/models");
+const EmailGroup = require("../../email-group/model");
 const { userSchema, tokenSchema } = require("../../model");
 const fs = require("fs");
 const calculatefrequency = require("../../utils/calculatefrequency");
+const FormData = require("form-data");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
 var prevstatus;
@@ -31,7 +33,7 @@ const authorizeUpdate = (req, res, next) => {
         });
       } else {
         const id = req.params.id;
-        const prevchain = await Chain.find({ _id: id }).populate(
+        const prevchain = await Chain.findOne({ _id: id }).populate(
           "emailgroupid"
         );
         // if (prevchain.userid.toString() !== token.userid.toString()) {
@@ -53,6 +55,7 @@ const authorizeUpdate = (req, res, next) => {
           frequency: chain.frequency,
           status: chain.status,
         };
+        console.log(prevchain);
         var linkedchains = prevchain.emailgroupid.chains;
         var ind = linkedchains.indexOf(id);
         EmailGroup.updateOne(
@@ -89,8 +92,10 @@ const authorizeUpdate = (req, res, next) => {
 const editchain = async (req, res) => {
   try {
     const id = req.params.id;
+    const authHeader = req.headers.authorization;
+    const tokenData = authHeader.split(" ")[1];
     // req.on("data", async function (data) {
-    const chain = await Chain.findOne({ _id: id });
+    const chain = await Chain.findOne({ _id: id }).populate("messageid");
     const chains = JSON.parse(req.body.body);
     const messageId = chains.messageid._id;
     if (req.files.length > 0 && chain.messageid.attachments.length > 0) {
@@ -99,6 +104,7 @@ const editchain = async (req, res) => {
       });
     }
     if (req.files.length > 0) {
+      var fd = new FormData();
       req.files.forEach((file) => {
         console.log(process.env.PWD + "/" + file.path);
         var data = fs.createReadStream(process.env.PWD + "/" + file.path);

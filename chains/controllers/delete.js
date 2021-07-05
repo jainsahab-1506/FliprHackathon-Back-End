@@ -4,6 +4,9 @@ const { userSchema, tokenSchema } = require("../../model");
 const User = new mongoose.model("User", userSchema);
 const axios = require("axios");
 const Token = new mongoose.model("Token", tokenSchema);
+const EmailGroup = require("../../email-group/model");
+
+
 const deletechain = (req, res) => {
   try {
     const id = req.params.id;
@@ -28,7 +31,7 @@ const deletechain = (req, res) => {
         });
       } else {
         try {
-          const chain = await Chain.find({ _id: id }).populate("emailgroupid");
+          const chain = await Chain.findOne({ _id: id }).populate("emailgroupid");
           // if (chain.userid.toString() !== token.userid.toString()) {
           //   return res
           //     .status(400)
@@ -37,7 +40,7 @@ const deletechain = (req, res) => {
           var linkedchains = chain.emailgroupid.chains;
           var ind = linkedchains.indexOf(id);
           EmailGroup.updateOne(
-            { _id: prevchain.emailgroupid },
+            { _id: chain.emailgroupid },
             { $pop: { chains: ind } }
           );
 
