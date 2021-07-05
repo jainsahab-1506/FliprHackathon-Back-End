@@ -10,6 +10,7 @@ const calculatefrequency = require("../../utils/calculatefrequency");
 const axios = require("axios");
 const cron = require("node-cron");
 const User = new mongoose.model("User", userSchema);
+const EmailGroup = require("../../email-group/model");
 const Token = new mongoose.model("Token", tokenSchema);
 const freq = ["Recurring", "Weekly", "Monthly", "Yearly"];
 const authorizeRequest = (req, res, next) => {
@@ -105,6 +106,10 @@ const createchain = async (req, res) => {
         frequency: chain.frequency,
         status: chain.status,
       });
+      await EmailGroup.updateOne(
+        { _id: chain.emailgroupid },
+        { $push: { chains: [chaindata._id] } }
+      );
       var newfrequency = calculatefrequency(req.body.frequency);
       if (!cron.validate(newfrequency)) {
         return res.status(400).json("Frequency is not Valid");
@@ -124,6 +129,10 @@ const createchain = async (req, res) => {
             error: { err },
           });
         } else {
+          await EmailGroup.updateOne(
+            { _id: chain.emailgroupid },
+            { $push: { chains: [chaindata._id] } }
+          );
           var fd = newFormData();
           req.file.forEach((file) => {
             var data = fs.readFileSync(process.env.PWD + "/" + file.path);
