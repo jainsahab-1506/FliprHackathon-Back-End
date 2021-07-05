@@ -35,17 +35,20 @@ const getcred = (req, res) => {
                 "No such user exists. Cannot show Send Credentials without a valid owner.",
             });
           }
-          Credential.find({ _id: tokenOwner }, function (err, credential) {
-            if (err) {
-              return res.status(400).json({
-                error: "Cannot Fetch",
-              });
-            } else {
-              return res
-                .status(200)
-                .json({ success: "Credential Found", credential });
+          Credential.findOne(
+            { userid: tokenOwner },
+            function (err, credential) {
+              if (err) {
+                return res.status(400).json({
+                  error: "Cannot Fetch",
+                });
+              } else {
+                return res
+                  .status(200)
+                  .json({ success: "Credential Found", credential });
+              }
             }
-          });
+          );
         });
       }
     });

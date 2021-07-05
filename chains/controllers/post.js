@@ -8,6 +8,7 @@ var FormData = require("form-data");
 var mime = require("mime-types");
 const calculatefrequency = require("../../utils/calculatefrequency");
 const axios = require("axios");
+const cron = require("node-cron");
 const User = new mongoose.model("User", userSchema);
 const Token = new mongoose.model("Token", tokenSchema);
 const freq = ["Recurring", "Weekly", "Monthly", "Yearly"];
@@ -45,19 +46,22 @@ const createchain = async (req, res) => {
   try {
     console.log(req.files);
     var fd = new FormData();
-    req.files.forEach((file) => {
-      var data = fs.createReadStream(process.env.PWD + "/" + file.path);
-      fd.append("files", data);
-    });
-    // console.log(fd);
-    var resp = await axios({
-      method: "post",
-      url: process.env.SERVER_URL1 + "/uploadfiles",
-      data: fd,
-      headers: {
-        "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
-      },
-    });
+    if (req.files > 0) {
+      req.files.forEach((file) => {
+        var data = fs.createReadStream(process.env.PWD + "/" + file.path);
+        fd.append("files", data);
+      });
+      // console.log(fd);
+      var resp = await axios({
+        method: "post",
+        url: process.env.SERVER_URL1 + "/uploadfiles",
+        data: fd,
+        headers: {
+          "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
+        },
+      });
+    }
+
     const authHeader = req.headers.authorization;
     const tokenData = authHeader.split(" ")[1];
     const chain = JSON.parse(req.body.body);
@@ -101,7 +105,10 @@ const createchain = async (req, res) => {
         frequency: chain.frequency,
         status: chain.status,
       });
-      var newfrequency = calculatefrequency(chain.frequency);
+      var newfrequency = calculatefrequency(req.body.frequency);
+      if (!cron.validate(newfrequency)) {
+        return res.status(400).json("Frequency is not Valid");
+      }
       messages.save(function (err, savedmessage) {
         if (err) {
           return res.status(400).json({
@@ -122,7 +129,7 @@ const createchain = async (req, res) => {
             var data = fs.readFileSync(process.env.PWD + "/" + file.path);
             fd.append(data);
           });
-          console.log(fd);
+          // console.log(fd);
           try {
             resp = await axios({
               method: "POST",

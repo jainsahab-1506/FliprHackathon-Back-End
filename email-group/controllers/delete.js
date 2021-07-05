@@ -51,7 +51,16 @@ const deleteEmailGroup = async (req, res) => {
         error: "Unauthorized request.",
       });
     }
-    emailGroup.chains.forEach(async (id) => await Chain.deleteOne({ _id: id }));
+    emailGroup.chains.forEach(async (id) => {
+      const resp = await axios({
+        method: "Delete",
+        url: process.env.SERVER_URL1 + "/deletecron/" + id,
+        headers: {
+          Authorization: "Bearer " + tokenData,
+        },
+      });
+      await Chain.deleteOne({ _id: id });
+    });
     EmailGroup.deleteOne({ _id: emailGroupId }, (err) => {
       if (err) {
         return res.status(400).json({ error: err.message });

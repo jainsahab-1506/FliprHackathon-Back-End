@@ -32,7 +32,9 @@ const authorizeUpdate = (req, res, next) => {
       } else {
         const id = req.params.id;
         const prevchain = await Chain.find({ _id: id });
-        prevstatus = prevchain.status;
+        if (prevchain.userid.toString() !== token.userid.toString()) {
+          return res.status(400).json("Error:You are not Authorized to Update");
+        }
         const chain = JSON.parse(req.body.body);
         console.log(chain);
         // req.on("data", function (data) {
@@ -77,10 +79,10 @@ const editchain = async (req, res) => {
     const id = req.params.id;
 
     // req.on("data", async function (data) {
-    console.log(req.files);
+    const chain = await Chain.findOne({ _id: id });
     const chains = JSON.parse(req.body.body);
     const messageId = chains.messageid._id;
-    if (req.files > 0) {
+    if (req.files > 0 && chain.messageid.attachments.length > 0) {
       chain.messageid.attachments.forEach((file) => {
         fs.unlinkSync(`${process.env.PWD}/${file.path}`);
       });
@@ -90,7 +92,7 @@ const editchain = async (req, res) => {
       {
         text: chains.messageid.text,
         attachments:
-          req.files.length > 0 ? req.files : chains.messageid.attachments,
+          req.files.length > 0 ? req.files : chain.messageid.attachments,
       },
       { new: true, omitUndefined: true, runValidators: true }
     );
