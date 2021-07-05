@@ -47,27 +47,35 @@ const createchain = async (req, res) => {
   try {
     console.log(req.files);
     var fd = new FormData();
-    if (req.files > 0) {
+    if (req.files.length > 0) {
       req.files.forEach((file) => {
+        console.log(process.env.PWD + "/" + file.path);
         var data = fs.createReadStream(process.env.PWD + "/" + file.path);
         fd.append("files", data);
       });
-      // console.log(fd);
-      var resp = await axios({
-        method: "post",
-        url: process.env.SERVER_URL1 + "/uploadfiles",
-        data: fd,
-        headers: {
-          "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
-        },
-      });
+      console.log(fd);
+      try{
+          var resp = await axios({
+            method: "post",
+            url: process.env.SERVER_URL1 + "/uploadfiles",
+            data: fd,
+            headers: {
+              "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
+            },
+          });
+          console.log(resp.data);
+        }
+        catch(err){
+          console.log(err);
+        }
+      
     }
 
     const authHeader = req.headers.authorization;
     const tokenData = authHeader.split(" ")[1];
     const chain = JSON.parse(req.body.body);
     console.log(chain);
-    User.find({ _id: chain.userid }, function (err, owner) {
+    User.find({ _id: chain.userid }, async function (err, owner) {
       if (!owner) {
         return res.status(400).json({
           error:
@@ -110,7 +118,8 @@ const createchain = async (req, res) => {
         { _id: chain.emailgroupid },
         { $push: { chains: [chaindata._id] } }
       );
-      var newfrequency = calculatefrequency(req.body.frequency);
+      var newfrequency = calculatefrequency(chain.frequency);
+      console.log(newfrequency);
       if (!cron.validate(newfrequency)) {
         return res.status(400).json("Frequency is not Valid");
       }
@@ -133,10 +142,10 @@ const createchain = async (req, res) => {
             { _id: chain.emailgroupid },
             { $push: { chains: [chaindata._id] } }
           );
-          var fd = newFormData();
-          req.file.forEach((file) => {
+          var fd = new FormData();
+          req.files.forEach((file) => {
             var data = fs.readFileSync(process.env.PWD + "/" + file.path);
-            fd.append(data);
+            fd.append("files", data);
           });
           // console.log(fd);
           try {

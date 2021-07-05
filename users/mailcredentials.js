@@ -36,7 +36,7 @@ router.post("/addmailcred", function (req, res) {
           error: "Invalid token.",
         });
       } else {
-        const authcode = req.body.authcode;
+        const authcode = req.body.code;
         console.log(authcode);
         try {
           const time = Math.round(new Date() / 1000);

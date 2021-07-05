@@ -1,4 +1,5 @@
 const calculatefrequency = (freq) => {
+  console.log(freq);
   if (freq.period === "Recurring") {
     var freq = "*/" + freq.seconds + " * * * * *";
     return freq;

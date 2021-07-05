@@ -29,11 +29,11 @@ const deletechain = (req, res) => {
       } else {
         try {
           const chain = await Chain.find({ _id: id });
-          if (chain.userid.toString() !== token.userid.toString()) {
-            return res
-              .status(400)
-              .json("Error:You are not Authorized to delete");
-          }
+          // if (chain.userid.toString() !== token.userid.toString()) {
+          //   return res
+          //     .status(400)
+          //     .json("Error:You are not Authorized to delete");
+          // }
           await Chain.deleteOne({ _id: id });
           const resp = await axios({
             method: "Delete",
@@ -42,10 +42,12 @@ const deletechain = (req, res) => {
               Authorization: "Bearer " + tokenData,
             },
           });
+          console.log(resp.data);
           return res
             .status(200)
             .json({ success: "Chain Successfully Deleted." });
         } catch (err) {
+          console.log(err);
           return res.status(400).json({
             error: "Unable to delete",
           });
@@ -53,6 +55,7 @@ const deletechain = (req, res) => {
       }
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ error: error.message });
   }
 };

@@ -64,7 +64,7 @@ const authorizeUpdate = (req, res, next) => {
           { _id: id },
           chaindata,
           { new: true, omitUndefined: true, runValidators: true },
-          function (err, updatedchain) {
+          async function (err, updatedchain) {
             if (err) {
               return res.status(400).json({
                 error: "Cannot Update Chain",
@@ -89,7 +89,6 @@ const authorizeUpdate = (req, res, next) => {
 const editchain = async (req, res) => {
   try {
     const id = req.params.id;
-
     // req.on("data", async function (data) {
     const chain = await Chain.findOne({ _id: id });
     const chains = JSON.parse(req.body.body);
