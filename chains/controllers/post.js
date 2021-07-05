@@ -54,21 +54,19 @@ const createchain = async (req, res) => {
         fd.append("files", data);
       });
       console.log(fd);
-      try{
-          var resp = await axios({
-            method: "post",
-            url: process.env.SERVER_URL1 + "/uploadfiles",
-            data: fd,
-            headers: {
-              "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
-            },
-          });
-          console.log(resp.data);
-        }
-        catch(err){
-          console.log(err);
-        }
-      
+      try {
+        var resp = await axios({
+          method: "post",
+          url: process.env.SERVER_URL1 + "/uploadfiles",
+          data: fd,
+          headers: {
+            "Content-Type": "multipart/form-data; boundary=" + fd.getBoundary(),
+          },
+        });
+        console.log(resp.data);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     const authHeader = req.headers.authorization;
@@ -114,10 +112,7 @@ const createchain = async (req, res) => {
         frequency: chain.frequency,
         status: chain.status,
       });
-      await EmailGroup.updateOne(
-        { _id: chain.emailgroupid },
-        { $push: { chains: [chaindata._id] } }
-      );
+
       var newfrequency = calculatefrequency(chain.frequency);
       console.log(newfrequency);
       if (!cron.validate(newfrequency)) {

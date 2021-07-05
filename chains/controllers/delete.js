@@ -28,12 +28,19 @@ const deletechain = (req, res) => {
         });
       } else {
         try {
-          const chain = await Chain.find({ _id: id });
+          const chain = await Chain.find({ _id: id }).populate("emailgroupid");
           // if (chain.userid.toString() !== token.userid.toString()) {
           //   return res
           //     .status(400)
           //     .json("Error:You are not Authorized to delete");
           // }
+          var linkedchains = chain.emailgroupid.chains;
+          var ind = linkedchains.indexOf(id);
+          EmailGroup.updateOne(
+            { _id: prevchain.emailgroupid },
+            { $pop: { chains: ind } }
+          );
+
           await Chain.deleteOne({ _id: id });
           const resp = await axios({
             method: "Delete",
