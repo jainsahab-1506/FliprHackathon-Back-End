@@ -6,7 +6,6 @@ const axios = require("axios");
 const Token = new mongoose.model("Token", tokenSchema);
 const EmailGroup = require("../../email-group/model");
 
-
 const deletechain = (req, res) => {
   try {
     const id = req.params.id;
@@ -31,7 +30,9 @@ const deletechain = (req, res) => {
         });
       } else {
         try {
-          const chain = await Chain.findOne({ _id: id }).populate("emailgroupid");
+          const chain = await Chain.findOne({ _id: id })
+            .populate("emailgroupid")
+            .populate("messageid");
           // if (chain.userid.toString() !== token.userid.toString()) {
           //   return res
           //     .status(400)
@@ -48,6 +49,9 @@ const deletechain = (req, res) => {
           const resp = await axios({
             method: "Delete",
             url: process.env.SERVER_URL1 + "/deletecron/" + id,
+            data: {
+              files: chain.messageid.attachments,
+            },
             headers: {
               Authorization: "Bearer " + tokenData,
             },

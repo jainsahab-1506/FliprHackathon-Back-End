@@ -52,9 +52,14 @@ const deleteEmailGroup = async (req, res) => {
       });
     }
     emailGroup.chains.forEach(async (id) => {
+      var chaindata = await Chain.findOne({ _id: id }).populate("messageid");
+
       const resp = await axios({
         method: "Delete",
         url: process.env.SERVER_URL1 + "/deletecron/" + id,
+        data: {
+          files: chain.messageid.attachments,
+        },
         headers: {
           Authorization: "Bearer " + tokenData,
         },

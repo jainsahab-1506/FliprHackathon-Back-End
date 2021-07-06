@@ -59,7 +59,7 @@ const authorizeUpdate = (req, res, next) => {
         var linkedchains = prevchain.emailgroupid.chains;
         var ind = linkedchains.indexOf(id);
         EmailGroup.updateOne(
-          { _id: prevchain.emailgroupid },
+          { _id: prevchain.emailgroupid._id },
           { $pop: { chains: ind } }
         );
 
@@ -75,7 +75,7 @@ const authorizeUpdate = (req, res, next) => {
             } else {
               await EmailGroup.updateOne(
                 { _id: chain.emailgroupid },
-                { $push: { chains: [chaindata._id] } }
+                { $push: { chains: [updatedchain._id] } }
               );
               next();
             }
@@ -110,6 +110,7 @@ const editchain = async (req, res) => {
         var data = fs.createReadStream(process.env.PWD + "/" + file.path);
         fd.append("files", data);
       });
+      fd.append("data", JSON.stringify(chain.messageid.attachments));
       console.log(fd);
       try {
         var resp = await axios({
