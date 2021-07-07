@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const EmailGroup = require("./../model");
 const { tokenSchema } = require("../../model");
 const { Chain } = require("../../chains/model");
-
+const { Messages } = require("../../messages/models");
+const axios = require("axios");
 const Token = new mongoose.model("Token", tokenSchema);
-
+const fs = require("fs");
 const deleteEmailGroup = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -32,7 +33,9 @@ const deleteEmailGroup = async (req, res) => {
     const tokenOwner = token.userid;
 
     const emailGroupId = req.params.id;
-    const emailGroup = await EmailGroup.findById(emailGroupId);
+    const emailGroup = await EmailGroup.findById(emailGroupId).populate(
+      "chains"
+    );
 
     if (!emailGroup) {
       return res.status(400).json({
@@ -51,20 +54,25 @@ const deleteEmailGroup = async (req, res) => {
         error: "Unauthorized request.",
       });
     }
-    emailGroup.chains.forEach(async (id) => {
-      var chaindata = await Chain.findOne({ _id: id }).populate("messageid");
-
+    emailGroup.chains.forEach(async (chain) => {
+      var chaindata = await Chain.findOne({ _id: chain._id }).populate(
+        "messageid"
+      );
+      chaindata.messageid.attachments.forEach((file) => {
+        fs.unlinkSync(`${process.env.PWD}/${file.path}`);
+      });
       const resp = await axios({
         method: "Delete",
-        url: process.env.SERVER_URL1 + "/deletecron/" + id,
+        url: process.env.SERVER_URL1 + "/deletecron/" + chain._id,
         data: {
-          files: chain.messageid.attachments,
+          files: chaindata.messageid.attachments,
         },
         headers: {
           Authorization: "Bearer " + tokenData,
         },
       });
-      await Chain.deleteOne({ _id: id });
+      await Chain.deleteOne({ _id: chain._id });
+      await Messages.deleteOne({ _id: chaindata.messageid._id });
     });
     EmailGroup.deleteOne({ _id: emailGroupId }, (err) => {
       if (err) {

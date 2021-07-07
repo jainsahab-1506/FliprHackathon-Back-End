@@ -36,17 +36,7 @@ const authorizeUpdate = (req, res, next) => {
         const prevchain = await Chain.findOne({ _id: id }).populate(
           "emailgroupid"
         );
-        // if (prevchain.userid.toString() !== token.userid.toString()) {
-        //   return res.status(400).json("Error:You are not Authorized to Update");
-        // }
         const chain = JSON.parse(req.body.body);
-        console.log(chain);
-        // req.on("data", function (data) {
-        // const chain = JSON.parse(data);
-        // console.log(data);
-        // console.log(data.toString());
-        // console.log(typeof chain);
-        // console.log(chain);
         const chaindata = {
           chainname: chain.chainname,
           userid: chain.userid,
@@ -54,14 +44,8 @@ const authorizeUpdate = (req, res, next) => {
           messageid: chain.messageid,
           frequency: chain.frequency,
           status: chain.status,
+          subject: chain.subject,
         };
-        console.log(prevchain);
-        var linkedchains = prevchain.emailgroupid.chains;
-        var ind = linkedchains.indexOf(id);
-        EmailGroup.updateOne(
-          { _id: prevchain.emailgroupid._id },
-          { $pop: { chains: ind } }
-        );
 
         Chain.findOneAndUpdate(
           { _id: id },
@@ -73,10 +57,6 @@ const authorizeUpdate = (req, res, next) => {
                 error: "Cannot Update Chain",
               });
             } else {
-              await EmailGroup.updateOne(
-                { _id: chain.emailgroupid },
-                { $push: { chains: [updatedchain._id] } }
-              );
               next();
             }
           }

@@ -1,14 +1,16 @@
-const { Chain, Messages } = require("./../model");
+const { Chain } = require("./../model");
+const { Messages } = require("../../messages/models");
 const mongoose = require("mongoose");
 const { userSchema, tokenSchema } = require("../../model");
 const User = new mongoose.model("User", userSchema);
 const axios = require("axios");
 const Token = new mongoose.model("Token", tokenSchema);
 const EmailGroup = require("../../email-group/model");
-
+const fs = require("fs");
 const deletechain = (req, res) => {
   try {
     const id = req.params.id;
+    console.log(id);
     const authHeader = req.headers.authorization;
     if (!authHeader.startsWith("Bearer ")) {
       return res.status(400).json({
@@ -33,19 +35,20 @@ const deletechain = (req, res) => {
           const chain = await Chain.findOne({ _id: id })
             .populate("emailgroupid")
             .populate("messageid");
+
+          console.log(chain);
           // if (chain.userid.toString() !== token.userid.toString()) {
           //   return res
           //     .status(400)
-          //     .json("Error:You are not Authorized to delete");
-          // }
-          var linkedchains = chain.emailgroupid.chains;
-          var ind = linkedchains.indexOf(id);
-          EmailGroup.updateOne(
-            { _id: chain.emailgroupid },
-            { $pop: { chains: ind } }
-          );
+          // //     .json("Error:You are not Authorized to delete");
+          // // }
 
+          console.log(chain.messageid.attachments);
+          chain.messageid.attachments.forEach((file) => {
+            fs.unlinkSync(`${process.env.PWD}/${file.path}`);
+          });
           await Chain.deleteOne({ _id: id });
+          await Messages.deleteOne({ _id: chain.messageid._id });
           const resp = await axios({
             method: "Delete",
             url: process.env.SERVER_URL1 + "/deletecron/" + id,

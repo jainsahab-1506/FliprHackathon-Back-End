@@ -21,7 +21,7 @@ const chainSchema = new mongoose.Schema({
   },
   frequency: { type: Object, required: true },
   status: { type: Boolean },
-  cronjobname: { type: String },
+  subject: { type: String, required: true },
 });
 
 module.exports.Chain = new mongoose.model("Chains", chainSchema);

@@ -111,6 +111,7 @@ const createchain = async (req, res) => {
         messageid: messages._id,
         frequency: chain.frequency,
         status: chain.status,
+        subject: chain.subject,
       });
 
       var newfrequency = calculatefrequency(chain.frequency);
@@ -133,10 +134,6 @@ const createchain = async (req, res) => {
             error: { err },
           });
         } else {
-          await EmailGroup.updateOne(
-            { _id: chain.emailgroupid },
-            { $push: { chains: [chaindata._id] } }
-          );
           var fd = new FormData();
           req.files.forEach((file) => {
             var data = fs.readFileSync(process.env.PWD + "/" + file.path);
