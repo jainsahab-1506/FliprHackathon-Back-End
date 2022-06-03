@@ -69,10 +69,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static("public"));
 
-app.get("/", function (req, res) {
-  res.send("Hello");
-});
-
 app.post("/register", register);
 app.post("/login", login);
 app.use("/", oauthloginroutes);
@@ -89,7 +85,9 @@ app.use("/users", UserRouter);
 app.use("/messages", MessageRouter);
 app.use("/", MailRouter);
 // app.use("/", MailerRouter);
-
+app.get("/", function (req, res) {
+  res.send("Hello");
+});
 app.listen(process.env.PORT || 8000, function (req, res) {
   console.log("Running");
 });

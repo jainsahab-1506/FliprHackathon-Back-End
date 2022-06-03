@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   mailCredentialsId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: "Credentials",
   },
   verified: Boolean,

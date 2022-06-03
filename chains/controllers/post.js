@@ -15,6 +15,7 @@ const Token = new mongoose.model("Token", tokenSchema);
 const freq = ["Recurring", "Weekly", "Monthly", "Yearly"];
 const authorizeRequest = (req, res, next) => {
   try {
+    console.log(req.headers);
     const authHeader = req.headers.authorization;
     if (!authHeader.startsWith("Bearer ")) {
       return res.status(400).json({
@@ -134,11 +135,6 @@ const createchain = async (req, res) => {
             error: { err },
           });
         } else {
-          var fd = new FormData();
-          req.files.forEach((file) => {
-            var data = fs.readFileSync(process.env.PWD + "/" + file.path);
-            fd.append("files", data);
-          });
           // console.log(fd);
           try {
             resp = await axios({

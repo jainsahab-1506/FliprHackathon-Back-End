@@ -5,11 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon App.js",
-<<<<<<< HEAD
     "start": "node App.js"
-=======
-    "start":"node App.js"
->>>>>>> naman_jain
   },
   "author": "",
   "license": "ISC",
